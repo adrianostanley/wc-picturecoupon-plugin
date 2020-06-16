@@ -149,3 +149,12 @@ function wc_cus_change_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
 	}
 	return $avatar;
 }
+
+
+
+
+
+add_action('get_footer', function() {
+	// .css
+	wp_enqueue_style('wc-picturecoupon', '/wp-content/plugins/wc-picturecoupon-plugin/assets/css/frontend/wc-picturecoupon-frontend.css');
+}, 1);

@@ -5,6 +5,11 @@ namespace PictureCoupon\Controls;
 use PictureCoupon\User\History;
 use PictureCoupon\User\Picture;
 
+/**
+ * This is the controller class to serve as the uploader for the user's account details page.
+ *
+ * @package PictureCoupon\Controls
+ */
 class Uploader {
 
 	/** @var string */
@@ -18,18 +23,22 @@ class Uploader {
 	}
 
 	public function get_upload_form() {
+		global $woocommerce;
+
 		return sprintf('
 			<fieldset>
 				<legend>%s</legend>
 				%s
+				%s
 				<form enctype="multipart/form-data" action="" method="POST">
-					<input type="hidden" name="MAX_FILE_SIZE" value="500000" />
+					<input type="hidden" name="MAX_FILE_SIZE" value="250000" />
 					<input name="%s" type="file" size="25" /><br><br>
 					<input type="submit" value="Upload" />
 				</form>
 			</fieldset>',
 			__( 'Change your profile picture' ),
 			$this->get_user_profile_picture(),
+			$this->get_user_previous_profile_pictures(),
 			self::PROFILE_PICTURE_PARAM_NAME
 		);
 	}
@@ -38,8 +47,34 @@ class Uploader {
 		return get_current_user_id();
 	}
 
+	public function get_user_previous_profile_pictures() {
+		if ( ! $this->history->has_older_pictures() ) {
+			return '';
+		}
+
+		$html = '<select>';
+
+		/** @var Picture $picture */
+		foreach ($this->history->get_older_pictures() as $picture) {
+			$html .= sprintf('<option style="background-image:url(\'%s\');">%s</option>', $picture->get_source(), $picture->get_id() );
+		}
+
+		$html .= '</select>';
+
+		return sprintf( '<span>You may also switch to a previous profile image</span>%s', $html );
+	}
+
 	public function get_user_profile_picture() {
-		return $this->history->get_current()->get_avatar_html();
+		$current_picture = $this->history->get_current();
+
+		if( ! $current_picture->is_valid() ) {
+			return __( 'You don\'t have a profile image yet' );
+		}
+
+		return "
+			<span class='wcpc-block'>Current profile picture</span>
+			<img class='wcpc-avatar' src='{$this->history->get_current()->get_source()}' />
+		";
 	}
 
 	public function update_profile_picture() {

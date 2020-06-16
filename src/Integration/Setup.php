@@ -27,7 +27,7 @@ class Setup extends \WC_Integration {
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
-			'custom_name' => array(
+			'max_profile_images' => array(
 				'title'             => __( 'Max profile images' ),
 				'type'              => 'text',
 				'description'       => __( 'Restricts the maximum number of profile images a user can have' ),
