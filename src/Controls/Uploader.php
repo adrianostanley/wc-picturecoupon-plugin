@@ -22,25 +22,33 @@ class Uploader {
 		$this->load_user_profile_picture_history();
 	}
 
-	public function get_upload_form() {
-		global $woocommerce;
-
+	public function get_html() {
 		return sprintf('
 			<fieldset>
 				<legend>%s</legend>
 				%s
 				%s
-				<form enctype="multipart/form-data" action="" method="POST">
-					<input type="hidden" name="MAX_FILE_SIZE" value="250000" />
-					<input name="%s" type="file" size="25" /><br><br>
-					<input type="submit" value="Upload" />
-				</form>
+				%s
 			</fieldset>',
 			__( 'Change your profile picture' ),
 			$this->get_user_profile_picture(),
 			$this->get_user_previous_profile_pictures(),
-			self::PROFILE_PICTURE_PARAM_NAME
+			$this->get_upload_form()
 		);
+	}
+
+	public function get_upload_form() {
+		if ( $this->history->is_full() ) {
+			return sprintf("<span class='wcpc-block'>%s</span>", __("Ops! Looks like you had hit your max amount of uploaded pictures. To unlock more pictures, please, buy a <strong>Power Premium Account</strong> from <span class='wcpc-lt'>$999</span> <strong>$998!</strong>"));
+		}
+
+		return "
+			<form enctype='multipart/form-data' action='' method='POST'>
+				<input type='hidden' name='MAX_FILE_SIZE' value='250000' />
+				<input name='{self::PROFILE_PICTURE_PARAM_NAME}' type='file' size='25' /><br><br>
+				<input type='submit' value='Upload' />
+			</form>
+		";
 	}
 
 	public function get_user_id() {

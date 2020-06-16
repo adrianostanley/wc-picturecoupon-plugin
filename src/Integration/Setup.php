@@ -4,22 +4,28 @@ namespace PictureCoupon\Integration;
 
 class Setup extends \WC_Integration {
 
+	private static $instance;
+
 	public function __construct() {
-		// global $woocommerce;
+		if ( ! isset( self::$instance ) ) {
+			// global $woocommerce;
 
-		$this->id                 = 'my-plugin-integration';
-		$this->method_title       = __( 'WooCommerce Picture Coupon Plugin' );
-		$this->method_description = __( 'Allows customers to upload multiple profile pictures and have better discount codes on products' );
+			$this->id = 'my-plugin-integration';
+			$this->method_title = __('WooCommerce Picture Coupon Plugin');
+			$this->method_description = __('Allows customers to upload multiple profile pictures and have better discount codes on products');
 
-		// Load the settings.
-		$this->init_form_fields();
-		$this->init_settings();
+			// Load the settings.
+			$this->init_form_fields();
+			$this->init_settings();
 
-		// Define user set variables.
-		// $this->custom_name          = $this->get_option( 'custom_name' );
+			// Define user set variables.
+			// $this->custom_name          = $this->get_option( 'custom_name' );
 
-		// Actions.
-		add_action( 'woocommerce_update_options_integration_' .  $this->id, array( $this, 'process_admin_options' ) );
+			// Actions.
+			add_action('woocommerce_update_options_integration_' . $this->id, array($this, 'process_admin_options'));
+
+			self::$instance = $this;
+		}
 	}
 
 	/**
@@ -35,5 +41,13 @@ class Setup extends \WC_Integration {
 				'default'           => ''
 			),
 		);
+	}
+
+	public function get_max_profile_pictures() {
+		return $this->settings["max_profile_images"];
+	}
+
+	public static function get_instance() {
+		return self::$instance;
 	}
 }

@@ -6,3 +6,7 @@
 .wcpc-block {
     display: block;
 }
+
+.wcpc-lt {
+    text-decoration: line-through;
+}

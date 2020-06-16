@@ -58,7 +58,7 @@ add_action( 'plugins_loaded', function() {
 add_action( 'woocommerce_before_edit_account_form', function( $atts, $content= NULL) {
 	$picture = new \PictureCoupon\Controls\Uploader();
 	$picture->update_profile_picture();
-	echo $picture->get_upload_form();
+	echo $picture->get_html();
 });
 
 // =========================================================================

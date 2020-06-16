@@ -2,6 +2,8 @@
 
 namespace PictureCoupon\User;
 
+use PictureCoupon\Integration\Setup;
+
 /**
  * This history is the structure behind all the pictures of a user.
  *
@@ -14,6 +16,8 @@ class History {
 	/** The meta_key reference for wp_usermeta table */
 	const PROFILE_PICTURES_HISTORY_META_NAME = 'wcpc_history';
 
+	private $max_profile_pictures;
+
 	/** @var Array All the pictures of a user */
 	private $pictures;
 
@@ -23,6 +27,7 @@ class History {
 	private function __construct( $user_id ) {
 		$this->pictures = [];
 		$this->user_id = $user_id;
+		$this->max_profile_pictures = Setup::get_instance()->get_max_profile_pictures();
 	}
 
 	/**
@@ -76,6 +81,13 @@ class History {
 	 */
 	public function is_empty() {
 		return empty( $this->pictures );
+	}
+
+	/**
+	 * @return bool true if the history had already hit the max number of profiles pictures a user can submit.
+	 */
+	public function is_full() {
+		return count($this->pictures) >= $this->max_profile_pictures;
 	}
 
 	/**
