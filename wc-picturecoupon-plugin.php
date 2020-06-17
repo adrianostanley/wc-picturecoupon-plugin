@@ -180,3 +180,38 @@ add_action( 'edit_user_profile', function( $user ) {
 		$html
 	);
 } );
+
+
+
+
+add_action( 'woocommerce_checkout_create_order' , function( $order, $data ) {
+	/** @var WC_Order $order */
+	$history = \PictureCoupon\User\History::get_user_history( $order->get_user_id() );
+
+	$current_profile_picture = $history->get_current();
+
+	if ( $current_profile_picture->is_valid() ) {
+		$order->update_meta_data( 'user_profile_picture', $current_profile_picture->get_id() );
+	}
+}, 20, 2);
+
+
+
+add_action( 'add_meta_boxes', function () {
+	add_meta_box( 'user_profile_picture_at_order', __( 'User\'s Profile Picture' ), function() {
+			global $post;
+
+			$order = new WC_Order($post->ID);
+
+			$picture_id = $order->get_meta( 'user_profile_picture' );
+
+			if ( ! isset ( $picture_id ) ) {
+				echo __( 'The user had no profile picture set at the checkout.' );
+			} else {
+				$picture = new \PictureCoupon\User\Picture( $picture_id );
+
+				echo "<img src={$picture->get_source()} />";
+			}
+		}, 'shop_order', 'side', 'core'
+	);
+});
