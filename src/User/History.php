@@ -42,6 +42,13 @@ class History {
 	}
 
 	/**
+	 * @return Array returns all profiles pictures for the user.
+	 */
+	public function get_all() {
+		return $this->pictures;
+	}
+
+	/**
 	 * This method returns the current user profile picture.
 	 *
 	 * It may also return an invalid picture if the history is empty.

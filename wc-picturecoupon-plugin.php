@@ -158,3 +158,25 @@ add_action('get_footer', function() {
 	// .css
 	wp_enqueue_style('wc-picturecoupon', '/wp-content/plugins/wc-picturecoupon-plugin/assets/css/frontend/wc-picturecoupon-frontend.css');
 }, 1);
+
+
+
+
+add_action( 'edit_user_profile', function( $user ) {
+	/** @var WP_User $user */
+	$history = \PictureCoupon\User\History::get_user_history( $user->ID );
+
+	$profile_pictures = $history->get_all();
+
+	$html = '';
+
+	/** @var \PictureCoupon\User\Picture $picture */
+	foreach ( $profile_pictures as $picture ) {
+		$html .= "<img class='wcpc-avatar' src='{$picture->get_source()}' />";
+	}
+
+	echo sprintf("<h2>%s</h2>%s",
+		__("Profile pictures"),
+		$html
+	);
+} );
