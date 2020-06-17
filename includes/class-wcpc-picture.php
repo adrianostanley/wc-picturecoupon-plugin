@@ -1,13 +1,9 @@
 <?php
 
-namespace PictureCoupon\User;
-
 /**
  * This is the representation of a picture, which encapsulates the logic provided by WordPress.
- *
- * @package PictureCoupon\User
  */
-class Picture {
+class WCPC_Picture {
 
 	/** @var int the image ID stored in wp_posts table */
 	private $id;

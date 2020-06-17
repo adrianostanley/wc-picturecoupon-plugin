@@ -1,14 +1,12 @@
 <?php
 
-namespace PictureCoupon\Integration;
+class WCPC_Setup extends \WC_Integration {
 
-class Setup extends \WC_Integration {
-
+	/** @var WCPC_Setup */
 	private static $instance;
 
 	public function __construct() {
 		if ( ! isset( self::$instance ) ) {
-			// global $woocommerce;
 
 			$this->id = 'my-plugin-integration';
 			$this->method_title = __('WooCommerce Picture Coupon Plugin');
@@ -18,10 +16,6 @@ class Setup extends \WC_Integration {
 			$this->init_form_fields();
 			$this->init_settings();
 
-			// Define user set variables.
-			// $this->custom_name          = $this->get_option( 'custom_name' );
-
-			// Actions.
 			add_action('woocommerce_update_options_integration_' . $this->id, array($this, 'process_admin_options'));
 
 			self::$instance = $this;
@@ -32,6 +26,7 @@ class Setup extends \WC_Integration {
 	 * Initialize integration settings form fields.
 	 */
 	public function init_form_fields() {
+
 		$this->form_fields = array(
 			'max_profile_images' => array(
 				'title'             => __( 'Max profile images' ),
@@ -44,10 +39,12 @@ class Setup extends \WC_Integration {
 	}
 
 	public function get_max_profile_pictures() {
+
 		return $this->settings["max_profile_images"];
 	}
 
 	public static function get_instance() {
+
 		return self::$instance;
 	}
 }

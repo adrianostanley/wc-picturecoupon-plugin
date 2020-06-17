@@ -1,16 +1,9 @@
 <?php
 
-namespace PictureCoupon\Controls;
-
-use PictureCoupon\User\History;
-use PictureCoupon\User\Picture;
-
 /**
  * This is the controller class to serve as the uploader for the user's account details page.
- *
- * @package PictureCoupon\Controls
  */
-class Uploader {
+class WCPC_Uploader {
 
 	/** @var string */
 	const PROFILE_PICTURE_PARAM_NAME = 'picture';
@@ -18,14 +11,16 @@ class Uploader {
 	/** @var string */
 	const RESTORE_PROFILE_PICTURE_PARAM_NAME = 'restore';
 
-	/** @var History */
+	/** @var WCPC_History */
 	private $history;
 
 	public function __construct() {
+
 		$this->load_user_profile_picture_history();
 	}
 
 	public function get_html() {
+
 		return sprintf('
 			<fieldset>
 				<legend>%s</legend>
@@ -42,7 +37,9 @@ class Uploader {
 	}
 
 	public function get_upload_form() {
+
 		if ( $this->history->is_full() ) {
+
 			return sprintf("<span class='wcpc-block'>%s</span>", __("Ops! Looks like you had hit your max amount of uploaded pictures. To unlock more slots, please, buy a <strong>Power Premium Account</strong> from <span class='wcpc-lt'>$999</span> <strong>$998!</strong>"));
 		}
 
@@ -55,11 +52,14 @@ class Uploader {
 	}
 
 	public function get_user_id() {
+
 		return get_current_user_id();
 	}
 
 	public function get_user_previous_profile_pictures() {
+
 		if ( ! $this->history->has_older_pictures() ) {
+
 			return '';
 		}
 
@@ -68,8 +68,9 @@ class Uploader {
 				<input type='hidden' id='wcpc-replace-image' name='%s' value='' />		
 			<div>", self::RESTORE_PROFILE_PICTURE_PARAM_NAME, self::RESTORE_PROFILE_PICTURE_PARAM_NAME );
 
-		/** @var Picture $picture */
+		/** @var WCPC_Picture $picture */
 		foreach ($this->history->get_older_pictures() as $picture) {
+
 			$html .= sprintf( "<div class='wcpc-inline' onclick='ProfilePicture.changeAvatarPicture(%s);'>%s</div>", $picture->get_id(), $picture->get_avatar( 64 ) );
 		}
 
@@ -79,9 +80,11 @@ class Uploader {
 	}
 
 	public function get_user_profile_picture() {
+
 		$current_picture = $this->history->get_current();
 
 		if( ! $current_picture->is_valid() ) {
+
 			return __( 'You don\'t have a profile image yet' );
 		}
 
@@ -147,14 +150,14 @@ class Uploader {
 	}
 
 	public function update_profile_picture() {
+
 		$this->load_user_profile_picture_history();
 
 		if( isset( $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ] ) ) {
-			echo '<pre>' . var_export($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ], true) . '</pre>';
 
 			for ( $i = 0; $i < count($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name']); $i++) {
 				$picture_id = $this->upload_profile_picture($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name'][$i], $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['tmp_name'][$i]);
-				$this->history->add(new Picture($picture_id));
+				$this->history->add(new WCPC_Picture($picture_id));
 			}
 
 			$this->history->save();
@@ -172,7 +175,7 @@ class Uploader {
 
 	private function load_user_profile_picture_history($reload = false) {
 		if ( $reload || ! isset( $this->history ) ) {
-			$this->history = History::get_user_history( $this->get_user_id() );
+			$this->history = WCPC_History::get_user_history( $this->get_user_id() );
 		}
 	}
 }

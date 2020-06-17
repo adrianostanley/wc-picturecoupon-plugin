@@ -1,21 +1,16 @@
 <?php
 
-namespace PictureCoupon\User;
-
-use PictureCoupon\Integration\Setup;
-
 /**
  * This history is the structure behind all the pictures of a user.
  *
  * This class acts as a way to serve all the picture requests the plugin may need in all views and controls.
- *
- * @package PictureCoupon\User
  */
-class History {
+class WCPC_History {
 
 	/** The meta_key reference for wp_usermeta table */
 	const PROFILE_PICTURES_HISTORY_META_NAME = 'wcpc_history';
 
+	/** @var int */
 	private $max_profile_pictures;
 
 	/** @var Array All the pictures of a user */
@@ -25,18 +20,21 @@ class History {
 	private $user_id;
 
 	private function __construct( $user_id ) {
+
 		$this->pictures = [];
 		$this->user_id = $user_id;
-		$this->max_profile_pictures = Setup::get_instance()->get_max_profile_pictures();
+		$this->max_profile_pictures = WCPC_Setup::get_instance()->get_max_profile_pictures();
 	}
 
 	/**
 	 * Adds a picture to the history instance only if the picture is a valid one.
 	 *
-	 * @param Picture $picture
+	 * @param WCPC_Picture $picture
 	 */
 	public function add( $picture ) {
+
 		if( $picture->is_valid() ) {
+
 			$this->pictures[] = $picture;
 		}
 	}
@@ -45,6 +43,7 @@ class History {
 	 * @return Array returns all profiles pictures for the user.
 	 */
 	public function get_all() {
+
 		return $this->pictures;
 	}
 
@@ -53,11 +52,13 @@ class History {
 	 *
 	 * It may also return an invalid picture if the history is empty.
 	 *
-	 * @return Picture
+	 * @return WCPC_Picture
 	 */
 	public function get_current() {
+
 		if ( $this->is_empty() ) {
-			return new Picture();
+
+			return new WCPC_Picture();
 		}
 
 		return end( $this->pictures );
@@ -69,7 +70,9 @@ class History {
 	 * @return Array
 	 */
 	public function get_older_pictures() {
+
 		if ( ! $this->has_older_pictures() ) {
+
 			return [];
 		}
 
@@ -80,6 +83,7 @@ class History {
 	 * @return bool true if the user has an avatar.
 	 */
 	public function has_profile_picture() {
+
 		return ! $this->is_empty();
 	}
 
@@ -87,6 +91,7 @@ class History {
 	 * @return bool true if the user history contains older profile pictures.
 	 */
 	public function has_older_pictures() {
+
 		return count( $this->pictures ) > 1;
 	}
 
@@ -94,6 +99,7 @@ class History {
 	 * @return bool true if the history has no pictures.
 	 */
 	public function is_empty() {
+
 		return empty( $this->pictures );
 	}
 
@@ -101,24 +107,29 @@ class History {
 	 * @return bool true if the history had already hit the max number of profiles pictures a user can submit.
 	 */
 	public function is_full() {
+
 		return count($this->pictures) >= $this->max_profile_pictures;
 	}
 
 	public function restore( $older_picture_id ) {
+
 		$older_picture = null;
 
 		/**
 		 * @var int $key
-		 * @var Picture $picture
+		 * @var WCPC_Picture $picture
 		 */
 		foreach( $this->pictures as $key => $picture ) {
+
 			if ( $older_picture_id == $picture->get_id() ) {
+
 				$older_picture = $picture;
 				break;
 			}
 		}
 
 		if ( isset ( $older_picture ) ) {
+
 			unset( $this->pictures[ $key ] );
 			$this->add( $older_picture );
 		}
@@ -130,6 +141,7 @@ class History {
 	 * This method must be called to update the user profile pictures.
 	 */
 	public function save() {
+
 		update_user_meta(
 			$this->user_id,
 			self::PROFILE_PICTURES_HISTORY_META_NAME,
@@ -142,16 +154,19 @@ class History {
 	 * database.
 	 *
 	 * @param int $user_id
-	 * @return History
+	 * @return WCPC_History
 	 */
 	public static function get_user_history( $user_id ) {
+
 		$pictures = get_user_meta( $user_id, self::PROFILE_PICTURES_HISTORY_META_NAME, false );
 
-		$history = new History( $user_id );
+		$history = new self( $user_id );
 
 		if ( ! empty ( $pictures ) ) {
-			foreach ($pictures[0] as $picture_id) {
-				$history->add(new Picture($picture_id));
+
+			foreach ( $pictures[0] as $picture_id ) {
+
+				$history->add( new WCPC_Picture( $picture_id ) );
 			}
 		}
 
