@@ -20,6 +20,19 @@ class Picture {
 	}
 
 	/**
+	 * @param int $size
+	 * @return string an HTML representation for this picture in an avatar model.
+	 */
+	public function get_avatar( $size = 32 ) {
+		return sprintf( "<img alt='avatar' src='%s' class='avatar avatar-%s photo' height='%s' width='%s' />",
+			$this->get_source(),
+			$size,
+			$size,
+			$size
+		);
+	}
+
+	/**
 	 * @return int the picture ID.
 	 */
 	public function get_id() {

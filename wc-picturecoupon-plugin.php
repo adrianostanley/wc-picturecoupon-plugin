@@ -61,63 +61,7 @@ add_action( 'woocommerce_before_edit_account_form', function( $atts, $content= N
 	echo $picture->get_html();
 });
 
-// =========================================================================
-/**
- * Function wc_cus_upload_picture
- *
- */
-function wc_cus_upload_picture( $foto ) {
 
-	$wordpress_upload_dir = wp_upload_dir();
-	// $wordpress_upload_dir['path'] is the full server path to wp-content/uploads/2017/05, for multisite works good as well
-	// $wordpress_upload_dir['url'] the absolute URL to the same folder, actually we do not need it, just to show the link to file
-	$i = 1; // number of tries when the file with the same name is already exists
-
-	$profilepicture = $foto;
-	$new_file_path = $wordpress_upload_dir['path'] . '/' . $profilepicture['name'];
-	$new_file_mime = mime_content_type( $profilepicture['tmp_name'] );
-
-	$log = new WC_Logger();
-
-	if( empty( $profilepicture ) )
-		$log->add('custom_profile_picture','File is not selected.');
-
-	if( $profilepicture['error'] )
-		$log->add('custom_profile_picture',$profilepicture['error']);
-
-
-	if( $profilepicture['size'] > wp_max_upload_size() )
-		$log->add('custom_profile_picture','It is too large than expected.');
-
-
-	if( !in_array( $new_file_mime, get_allowed_mime_types() ))
-		$log->add('custom_profile_picture','WordPress doesn\'t allow this type of uploads.' );
-
-	while( file_exists( $new_file_path ) ) {
-		$i++;
-		$new_file_path = $wordpress_upload_dir['path'] . '/' . $i . '_' . $profilepicture['name'];
-	}
-
-	// looks like everything is OK
-	if( move_uploaded_file( $profilepicture['tmp_name'], $new_file_path ) ) {
-
-
-		$upload_id = wp_insert_attachment( array(
-			'guid'           => $new_file_path,
-			'post_mime_type' => $new_file_mime,
-			'post_title'     => preg_replace( '/\.[^.]+$/', '', $profilepicture['name'] ),
-			'post_content'   => '',
-			'post_status'    => 'inherit'
-		), $new_file_path );
-
-		// wp_generate_attachment_metadata() won't work if you do not include this file
-		require_once( ABSPATH.'/wp-admin/includes/image.php' );
-
-		// Generate and save the attachment metas into the database
-		wp_update_attachment_metadata( $upload_id, wp_generate_attachment_metadata( $upload_id, $new_file_path ) );
-		return $upload_id;
-	}
-}
 
 
 // =========================================================================
@@ -141,10 +85,10 @@ function wc_cus_change_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
 	}
 
 	if ( $user && is_object( $user ) ) {
-		$picture_id = get_user_meta($user->data->ID,'profile_pic');
-		if(! empty($picture_id)){
-			$avatar = wp_get_attachment_url( $picture_id[0] );
-			$avatar = "<img alt='{$alt}' src='{$avatar}' class='avatar avatar-{$size} photo' height='{$size}' width='{$size}' />";
+		$history = \PictureCoupon\User\History::get_user_history($user->ID);
+
+		if ( $history->has_profile_picture() ) {
+			$avatar = $history->get_current()->get_avatar( $size );
 		}
 	}
 	return $avatar;
@@ -155,8 +99,9 @@ function wc_cus_change_avatar( $avatar, $id_or_email, $size, $default, $alt ) {
 
 
 add_action('get_footer', function() {
-	// .css
-	wp_enqueue_style('wc-picturecoupon', '/wp-content/plugins/wc-picturecoupon-plugin/assets/css/frontend/wc-picturecoupon-frontend.css');
+	wp_enqueue_script( 'wc-picturecoupon', '/wp-content/plugins/wc-picturecoupon-plugin/assets/js/frontend/wc-picturecoupon-frontend.js' );
+
+	wp_enqueue_style( 'wc-picturecoupon', '/wp-content/plugins/wc-picturecoupon-plugin/assets/css/frontend/wc-picturecoupon-frontend.css' );
 }, 1);
 
 
@@ -172,7 +117,7 @@ add_action( 'edit_user_profile', function( $user ) {
 
 	/** @var \PictureCoupon\User\Picture $picture */
 	foreach ( $profile_pictures as $picture ) {
-		$html .= "<img class='wcpc-avatar' src='{$picture->get_source()}' />";
+		$html .= $picture->get_avatar( 96 );
 	}
 
 	echo sprintf("<h2>%s</h2>%s",

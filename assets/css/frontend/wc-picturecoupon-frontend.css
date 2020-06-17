@@ -1,12 +1,15 @@
-.wcpc-avatar {
-    border-radius: 50%;
-    max-width: 100px !important;
-}
-
 .wcpc-block {
     display: block;
 }
 
+.wcpc-inline {
+    display: inline;
+}
+
 .wcpc-lt {
     text-decoration: line-through;
+}
+
+.wcpc-pointer {
+    cursor: pointer;
 }

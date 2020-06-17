@@ -77,6 +77,13 @@ class History {
 	}
 
 	/**
+	 * @return bool true if the user has an avatar.
+	 */
+	public function has_profile_picture() {
+		return ! $this->is_empty();
+	}
+
+	/**
 	 * @return bool true if the user history contains older profile pictures.
 	 */
 	public function has_older_pictures() {
@@ -95,6 +102,26 @@ class History {
 	 */
 	public function is_full() {
 		return count($this->pictures) >= $this->max_profile_pictures;
+	}
+
+	public function restore( $older_picture_id ) {
+		$older_picture = null;
+
+		/**
+		 * @var int $key
+		 * @var Picture $picture
+		 */
+		foreach( $this->pictures as $key => $picture ) {
+			if ( $older_picture_id == $picture->get_id() ) {
+				$older_picture = $picture;
+				break;
+			}
+		}
+
+		if ( isset ( $older_picture ) ) {
+			unset( $this->pictures[ $key ] );
+			$this->add( $older_picture );
+		}
 	}
 
 	/**
