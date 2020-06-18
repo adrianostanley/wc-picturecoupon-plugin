@@ -9,20 +9,31 @@ class WCPC_Uploader {
 	const PROFILE_PICTURE_PARAM_NAME = 'picture';
 
 	/** @var string */
+	const REMOVE_PROFILE_PICTURE_PARAM_NAME = 'remove';
+
+	/** @var string */
 	const RESTORE_PROFILE_PICTURE_PARAM_NAME = 'restore';
 
 	/** @var WCPC_History */
 	private $history;
 
+	/** @var int */
+	private $user_id;
+
 	public function __construct() {
 
-		$this->load_user_profile_picture_history();
+		$this->load_history();
 	}
 
+	/**
+	 * Renders the uploader HTML.
+	 *
+	 * @return string
+	 */
 	public function get_html() {
 
 		return sprintf('
-			<fieldset>
+			<fieldset id="wcpc-uploader">
 				<legend>%s</legend>
 				%s
 				%s
@@ -36,6 +47,12 @@ class WCPC_Uploader {
 		);
 	}
 
+	/**
+	 * Builds the upload form, which may be available only if thu user didn't uploaded the limit defined by the admin in
+	 * the plugin settings.
+	 *
+	 * @return string
+	 */
 	public function get_upload_form() {
 
 		if ( $this->history->is_full() ) {
@@ -51,11 +68,28 @@ class WCPC_Uploader {
 		",self::PROFILE_PICTURE_PARAM_NAME );
 	}
 
+	/**
+	 * This function works with an internal cache to prevent multiple calls to the WordPress API.
+	 *
+	 * @return int the current logged user id.
+	 */
 	public function get_user_id() {
 
-		return get_current_user_id();
+		if( ! isset ( $this->user_id ) ) {
+
+			$this->user_id = get_current_user_id();
+		}
+
+		return $this->user_id;
 	}
 
+	/**
+	 * Builds the HTML for the user to select one of his/her previous uploaded profile pictures.
+	 *
+	 * This component also offers the options to restore and remove a picture.
+	 *
+	 * @return string
+	 */
 	public function get_user_previous_profile_pictures() {
 
 		if ( ! $this->history->has_older_pictures() ) {
@@ -64,21 +98,45 @@ class WCPC_Uploader {
 		}
 
 		$html = sprintf( "
-			<form id='wcpc-replace-form' method='POST'>
-				<input type='hidden' id='wcpc-replace-image' name='%s' value='' />		
-			<div>", self::RESTORE_PROFILE_PICTURE_PARAM_NAME, self::RESTORE_PROFILE_PICTURE_PARAM_NAME );
+			<form id='wcpc-options-form' method='POST'>
+				<input type='hidden' id='wcpc-replace-image' name='%s' value='' />
+				<input type='hidden' id='wcpc-remove-image' name='%s' value='' />
+				<div>",
+				self::RESTORE_PROFILE_PICTURE_PARAM_NAME,
+				self::REMOVE_PROFILE_PICTURE_PARAM_NAME
+		);
+
+		$html .= '<table>';
 
 		/** @var WCPC_Picture $picture */
 		foreach ($this->history->get_older_pictures() as $picture) {
 
-			$html .= sprintf( "<div class='wcpc-inline' onclick='ProfilePicture.changeAvatarPicture(%s);'>%s</div>", $picture->get_id(), $picture->get_avatar( 64 ) );
+			$html .= sprintf( "
+				<tr>
+					<td>%s</td>
+					<td>%s</td>
+					<td>
+						<a href='#' onclick='_wcpc.changeAvatarPicture(%s);'>Use this</a>&nbsp;|&nbsp;
+						<a href='#' onclick='_wcpc.removeAvatarPicture(%s);'>Remove</a>
+					</td>
+				</tr>",
+				$picture->get_avatar( 48 ),
+				$picture->get_file_name(),
+				$picture->get_id(),
+				$picture->get_id()
+			);
 		}
 
-		$html .= '</div></form>';
+		$html .= '</table></div></form>';
 
 		return sprintf( '<hr /><span>You may also switch to a previous profile image</span>%s', $html );
 	}
 
+	/**
+	 * Builds the HTML to show the user's current profile picture.
+	 *
+	 * @return string|void
+	 */
 	public function get_user_profile_picture() {
 
 		$current_picture = $this->history->get_current();
@@ -90,92 +148,92 @@ class WCPC_Uploader {
 
 		return sprintf("
 			<span class='wcpc-block'>Current profile picture</span>
-			%s
-		", $current_picture->get_avatar( 96 ) );
+			%s",
+			$current_picture->get_avatar( 96 )
+		);
 	}
 
 	/**
-	 * Function wc_cus_upload_picture
+	 * This function calls WCPC_History functions to add, restore or remove pictures.
+	 */
+	public function update_history() {
+
+		$upload = isset( $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ] );
+		$restore = isset ( $_POST[ self::RESTORE_PROFILE_PICTURE_PARAM_NAME ] );
+		$remove = isset ( $_POST[ self::REMOVE_PROFILE_PICTURE_PARAM_NAME ] );
+
+		if( $upload ) {
+
+			for ( $i = 0; $i < count($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name']); $i++) {
+
+				$picture_id = $this->upload_profile_picture($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name'][$i], $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['tmp_name'][$i]);
+
+				$this->history->add(new WCPC_Picture($picture_id), true );
+			}
+		}
+
+		if ( $restore ) {
+
+			$this->history->restore( $_POST[ self::RESTORE_PROFILE_PICTURE_PARAM_NAME ] );
+		}
+
+		if ( $remove ) {
+
+			$this->history->remove( $_POST[ self::REMOVE_PROFILE_PICTURE_PARAM_NAME ] );
+		}
+
+		$this->history->save();
+
+		$this->load_history( true );
+	}
+
+	/**
+	 * Stores the uploaded file, preventing duplicated names and calling the WordPress proper attachment API methods.
 	 *
+	 * @param string $name
+	 * @param string $tmp_name
+	 * @return int|WP_Error
 	 */
 	public function upload_profile_picture( $name, $tmp_name ) {
 
-		$wordpress_upload_dir = wp_upload_dir();
+		$wp_upload_path = wp_upload_dir()[ 'path' ];
 
-		$i = 1; // number of tries when the file with the same name is already exists
+		// Used to prevent duplicated files
+		$file_counter = 1;
 
-		// $profilepicture = $foto;
-		$new_file_path = $wordpress_upload_dir['path'] . '/' . $name;
+		$new_file_path = $wp_upload_path . '/' . $name;
 		$new_file_mime = mime_content_type( $tmp_name );
 
-		/*$log = new WC_Logger();
-
-		if( empty( $profilepicture ) )
-			$log->add('custom_profile_picture','File is not selected.');
-
-		if( $profilepicture['error'] )
-			$log->add('custom_profile_picture',$profilepicture['error']);
-
-
-		if( $profilepicture['size'] > wp_max_upload_size() )
-			$log->add('custom_profile_picture','It is too large than expected.');
-
-
-		if( !in_array( $new_file_mime, get_allowed_mime_types() ))
-			$log->add('custom_profile_picture','WordPress doesn\'t allow this type of uploads.' );*/
-
 		while( file_exists( $new_file_path ) ) {
-			$i++;
-			$new_file_path = $wordpress_upload_dir['path'] . '/' . $i . '_' . $name;
+
+			$new_file_path = sprintf( '%s/%s_%s', $wp_upload_path, $name, $file_counter++ );
 		}
 
-		// looks like everything is OK
 		if( move_uploaded_file( $tmp_name, $new_file_path ) ) {
 
 			$upload_id = wp_insert_attachment( array(
+
 				'guid'           => $new_file_path,
 				'post_mime_type' => $new_file_mime,
-				'post_title'     => preg_replace( '/\.[^.]+$/', '', $name ),
+				'post_title'     => sanitize_title( $name ),
 				'post_content'   => '',
 				'post_status'    => 'inherit'
 			), $new_file_path );
 
-			// wp_generate_attachment_metadata() won't work if you do not include this file
-			require_once( ABSPATH.'/wp-admin/includes/image.php' );
+			require_once( ABSPATH . '/wp-admin/includes/image.php' );
 
-			// Generate and save the attachment metas into the database
 			wp_update_attachment_metadata( $upload_id, wp_generate_attachment_metadata( $upload_id, $new_file_path ) );
+
 			return $upload_id;
 		}
 	}
 
-	public function update_profile_picture() {
+	/**
+	 * Brings the user profile picture history to this controller, in order to manipulate its contents to add, restore
+	 * or remove pictures.
+	 */
+	private function load_history() {
 
-		$this->load_user_profile_picture_history();
-
-		if( isset( $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ] ) ) {
-
-			for ( $i = 0; $i < count($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name']); $i++) {
-				$picture_id = $this->upload_profile_picture($_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['name'][$i], $_FILES[ self::PROFILE_PICTURE_PARAM_NAME ]['tmp_name'][$i]);
-				$this->history->add(new WCPC_Picture($picture_id));
-			}
-
-			$this->history->save();
-
-			$this->load_user_profile_picture_history( true );
-		}
-
-		if ( isset ( $_POST[ self::RESTORE_PROFILE_PICTURE_PARAM_NAME ] ) ) {
-			$this->history->restore( $_POST[ self::RESTORE_PROFILE_PICTURE_PARAM_NAME ] );
-			$this->history->save();
-
-			$this->load_user_profile_picture_history( true );
-		}
-	}
-
-	private function load_user_profile_picture_history($reload = false) {
-		if ( $reload || ! isset( $this->history ) ) {
-			$this->history = WCPC_History::get_user_history( $this->get_user_id() );
-		}
+		$this->history = WCPC_History::get_user_history( $this->get_user_id() );
 	}
 }

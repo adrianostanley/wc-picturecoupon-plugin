@@ -22,6 +22,9 @@ defined( 'ABSPATH' ) or exit;
  */
 class WCPC_Loader {
 
+	/** The order meta key to store the user's current profile picture at the checkout */
+	const USER_PROFILE_PICTURE_ORDER_META_KEY = 'wcpc_userpp';
+
 	/** @var WCPC_Loader the only possible instance of this plugin */
 	private static $instance;
 
@@ -74,22 +77,25 @@ class WCPC_Loader {
 	public function add_action_add_metaboxes() {
 
 		add_action( 'add_meta_boxes', function() {
+
 			add_meta_box( 'user_profile_picture_at_order', __( 'User\'s Profile Picture' ), function() {
+
 				global $post;
 
 				$order = new WC_Order($post->ID);
 
-				$picture_id = $order->get_meta( 'user_profile_picture' );
+				$picture_id = $order->get_meta( self::USER_PROFILE_PICTURE_ORDER_META_KEY );
 
-				if ( ! isset ( $picture_id ) ) {
+				if ( empty( $picture_id ) ) {
+
 					echo __( 'The user had no profile picture set at the checkout.' );
 				} else {
+
 					$picture = new WCPC_Picture( $picture_id );
 
 					echo $picture->get_avatar( 128 );
 				}
-			}, 'shop_order', 'side', 'core'
-			);
+			}, 'shop_order', 'side', 'core'	);
 		});
 	}
 
@@ -102,7 +108,7 @@ class WCPC_Loader {
 		add_action( 'woocommerce_before_edit_account_form', function( $atts, $content = NULL) {
 
 			$picture = new WCPC_Uploader();
-			$picture->update_profile_picture();
+			$picture->update_history();
 			echo $picture->get_html();
 		});
 	}
@@ -200,7 +206,8 @@ class WCPC_Loader {
 			$current_profile_picture = $history->get_current();
 
 			if ( $current_profile_picture->is_valid() ) {
-				$order->update_meta_data( 'user_profile_picture', $current_profile_picture->get_id() );
+
+				$order->update_meta_data( self::USER_PROFILE_PICTURE_ORDER_META_KEY, $current_profile_picture->get_id() );
 			}
 		}, 20, 2);
 	}

@@ -33,8 +33,14 @@ class WCPC_History {
 	 * Adds a picture to the history instance only if the picture is a valid one.
 	 *
 	 * @param WCPC_Picture $picture
+	 * @param bool $full_check performs (or not) a check to avoid adding more pictures than the history limit.
 	 */
-	public function add( $picture ) {
+	public function add( $picture, $full_check = true ) {
+
+		if ( $full_check && $this->is_full() ) {
+
+			return;
+		}
 
 		if( $picture->is_valid() ) {
 
@@ -152,6 +158,33 @@ class WCPC_History {
 		return count($this->pictures) >= $this->max_profile_pictures;
 	}
 
+	/**
+	 * Removes the picture ID from the history.
+	 *
+	 * @param $older_picture_id
+	 */
+	public function remove( $older_picture_id ) {
+
+		/**
+		 * @var int $key
+		 * @var WCPC_Picture $picture
+		 */
+		foreach( $this->pictures as $key => $picture ) {
+
+			if ( $older_picture_id == $picture->get_id() ) {
+
+				unset( $this->pictures[ $key ] );
+
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Moves the picture ID to the end of the history, which makes it the user's current picture.
+	 *
+	 * @param $older_picture_id
+	 */
 	public function restore( $older_picture_id ) {
 
 		$older_picture = null;
@@ -165,6 +198,7 @@ class WCPC_History {
 			if ( $older_picture_id == $picture->get_id() ) {
 
 				$older_picture = $picture;
+
 				break;
 			}
 		}
@@ -172,7 +206,8 @@ class WCPC_History {
 		if ( isset ( $older_picture ) ) {
 
 			unset( $this->pictures[ $key ] );
-			$this->add( $older_picture );
+
+			$this->add( $older_picture, false );
 		}
 	}
 
@@ -184,6 +219,7 @@ class WCPC_History {
 	public function save() {
 
 		update_user_meta(
+
 			$this->user_id,
 			self::PROFILE_PICTURES_HISTORY_META_NAME,
 			array_map( function  ( $picture ) { return $picture->get_id(); }, $this->pictures )
@@ -207,7 +243,7 @@ class WCPC_History {
 
 			foreach ( $pictures[0] as $picture_id ) {
 
-				$history->add( new WCPC_Picture( $picture_id ) );
+				$history->add( new WCPC_Picture( $picture_id ), false );
 			}
 		}
 
