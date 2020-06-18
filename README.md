@@ -14,6 +14,26 @@ For example, instead of creating a settings page to allow admins to set the max 
 
 In this same approach, the criteria "admins can see all available customer profile images on a customer's user profile page" was achieved by `edit_user_profile` action so a section is added to the WordPress default user profile page.
 
+### Acceptance Criteria
+
+#### 1 - Customers can upload multiple profile pictures
+
+#### 2 - Customers can change their primary profile image
+
+#### 3 - Admins can see all available customer profile images on a customer’s user profile page 
+
+#### 4 - Admins can see the primary selected profile picture on a customer’s order
+
+#### 5 - Admins can restrict the maximum number of profile images a user can have from within the plugins admin settings
+
+#### 6 - When visiting a previous order the admin will see the profile image set as the default at the time of that order
+
+#### 7 - There is a REST API endpoint that returns the name, file type, associated user, and public URL for all customer profile images
+
+#### 8 - Only authenticated users can access image information over the API
+
+**How can I improve this?** Using other better authentication methods like OAuth.
+
 ## Code Implementation Decisions
 
 ### Formatting defaults

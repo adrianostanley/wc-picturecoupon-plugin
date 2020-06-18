@@ -23,7 +23,10 @@ defined( 'ABSPATH' ) or exit;
 class WCPC_Loader {
 
 	/** @var WCPC_Loader the only possible instance of this plugin */
-	protected static $instance;
+	private static $instance;
+
+	/** @var WCPC_Rest_API_Controller */
+	private $rest_api;
 
 	/**
 	 * Initializes the loader.
@@ -33,6 +36,8 @@ class WCPC_Loader {
 		$this->load_classes();
 		$this->add_actions();
 		$this->add_filters();
+
+		$this->rest_api = new WCPC_Rest_API_Controller();
 	}
 
 	/**
@@ -40,11 +45,17 @@ class WCPC_Loader {
 	 */
 	public function add_actions() {
 
-		$this->add_action_add_metaboxes();
 		$this->add_action_plugins_loaded();
+
+		if( is_admin() ) {
+
+			$this->add_action_add_metaboxes();
+			$this->add_action_edit_user_profile();
+		}
+
 		$this->add_action_edit_account_form();
-		$this->add_action_edit_user_profile();
 		$this->add_action_get_footer();
+		$this->add_action_rest_api_init();
 		$this->add_action_woocommerce_checkout_create_order();
 	}
 
@@ -166,6 +177,17 @@ class WCPC_Loader {
 	}
 
 	/**
+	 * Registers the action of creating a REST API endpoint for showing profile pictures data.
+	 */
+	public function add_action_rest_api_init() {
+
+		add_action( 'rest_api_init', function () {
+
+			$this->rest_api->register_routes();
+		} );
+	}
+
+	/**
 	 * Registers the action that stores the current user's profile picture in the order meta data.
 	 */
 	public function add_action_woocommerce_checkout_create_order() {
@@ -223,6 +245,7 @@ class WCPC_Loader {
 	public function load_classes() {
 		require_once( plugin_dir_path( __FILE__ ) . 'includes/class-wcpc-history.php' );
 		require_once( plugin_dir_path( __FILE__ ) . 'includes/class-wcpc-picture.php' );
+		require_once( plugin_dir_path( __FILE__ ) . 'includes/class-wcpc-restapi.php' );
 		require_once( plugin_dir_path( __FILE__ ) . 'includes/class-wcpc-uploader.php' );
 	}
 

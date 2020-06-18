@@ -19,6 +19,9 @@ class WCPC_History {
 	/** @var int The user ID history owner */
 	private $user_id;
 
+	/** @var WP_User */
+	private $user;
+
 	private function __construct( $user_id ) {
 
 		$this->pictures = [];
@@ -62,6 +65,44 @@ class WCPC_History {
 		}
 
 		return end( $this->pictures );
+	}
+
+	/**
+	 * Builds an array data structure to the user's history which is easily converted to a JSON object.
+	 */
+	public function get_data() {
+
+		$user = $this->get_user();
+
+		return [
+			'count' => count( $this->pictures ),
+			'user' => [
+				'id' => $user->ID,
+				'display_name' => $user->display_name,
+				'username' => $user->user_login
+			],
+			'pictures' => array_map(
+				function( $picture ) {
+
+					/** @var WCPC_Picture $picture */
+					return $picture->get_data();
+				},
+				$this->pictures
+			)
+		];
+	}
+
+	/**
+	 * @return bool|WP_User the user WordPress instance for this history.
+	 */
+	public function get_user() {
+
+		if( ! isset( $this->user ) ) {
+
+			$this->user = get_user_by( 'ID', $this->user_id );
+		}
+
+		return $this->user;
 	}
 
 	/**
@@ -169,6 +210,25 @@ class WCPC_History {
 				$history->add( new WCPC_Picture( $picture_id ) );
 			}
 		}
+
+		return $history;
+	}
+
+	/**
+	 * This is an "overload" for get_user_history to be used when the caller has already a WP_User instance loaded.
+	 *
+	 * A History can have a WP_User stored - although it's not necessary to load its pictures. But whenever the user
+	 * information is needed, it can request it to WordPress API. By using get_user_history_by_user and passing a valid
+	 * WP_User instance, you may save this request.
+	 *
+	 * @param WP_User $user
+	 * @return WCPC_History
+	 */
+	public static function get_user_history_by_user( $user ) {
+
+		$history = self::get_user_history( $user->ID );
+
+		$history->user = $user;
 
 		return $history;
 	}
