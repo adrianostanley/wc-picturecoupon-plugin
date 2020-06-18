@@ -24,12 +24,7 @@
     display: inline;
 }
 
-#wcpc-uploader img.avatar-48 {
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-#wcpc-uploader img.avatar-48:hover {
-    border: solid 2px #CCC;
-    width: 1.5em;
+#wcpc-uploader img.avatar {
+    border: solid 3px #CCC;
+    border-radius: 50%;
 }

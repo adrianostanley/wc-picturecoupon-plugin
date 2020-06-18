@@ -1,5 +1,19 @@
 # WooCommerce Picture Coupon Plugin
 
+## Compatibility
+
+(wip)
+
+**Note:** Although I have used `__('...')` functions, there's no i18n files for the WooCommerce Picture Coupon Plugin.
+
+Finally, in order to allow users to create an account, I've checked both options in the WooCommerce settings
+below. It was not clear to me if the plugin should warn admin users about that in case they're unchecked,
+but to keep it simple, I've selected them manually. 
+
+* WooCommerce > Settings > Account & Privacy
+  * Allow customers to create an account during checkout
+  * Allow customers to create an account on the "My account" page
+
 ## Approach / Reasoning to the Solution
 
 (intro)
@@ -10,6 +24,8 @@ needs;
 * Treat the profile picture domain classes as objects;
 * Keep the plugin code simple and easy to read - via the documentation above each function and even the
 code itself;
+* Observe how SkyVerge had developed Jilt and its framework plugins to make an attempt to release a code
+in compliance with its standards;
 * Don't spend a lot of time with the layout and the usability itself. Although they are very important,
 especially in a plugin used by users with good and bad WordPress skills, I prefer to dedicate my time on
 its architecture and in the code standards.
@@ -160,9 +176,9 @@ covers this criteria.
 
 `WCPC_Rest_API_Controller register_routes` function adds two endpoints:
 
-* **/profile-pictures/all** returns a JSON with all users with their histories that contain all of their
+* `/profile-pictures/all` returns a JSON with all users with their histories that contain all of their
 profile pictures;
-* **/profile-pictures/user_id** returns a JSON with the history of a user where `user_id` must be an integer
+* `/profile-pictures/user_id` returns a JSON with the history of a user where `user_id` must be an integer
 bigger than zero and be a valid user ID.
 
 Both endpoins calls functions in the `WCPC_Rest_API_Controller` as well and they're make use of the
@@ -198,3 +214,8 @@ Here's a list of functionalities I would work on if the plugin was about to be r
 * Database cleaner methods to remove stored data when the plugin is uninstalled;
 * A better design for the Rest API endpoints controller;
 * A huge maintenance in the user widgets to improve usability, especially for the uploader components;
+* Improve the plugin compatibility, since it was developed with a PHP 7.4.5 version and it should work
+even in lower versions, preferrable from 5.6.0;
+* Show warnings in the WordPress admin dashboard if the WooCommerce settings for allowing customers to
+create accounts are disabled;
+* i18n files;
