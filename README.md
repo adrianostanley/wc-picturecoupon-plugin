@@ -20,7 +20,13 @@ In this same approach, the criteria "admins can see all available customer profi
 
 #### 2 - Customers can change their primary profile image
 
-#### 3 - Admins can see all available customer profile images on a customer’s user profile page 
+#### 3 - Admins can see all available customer profile images on a customer’s user profile page
+
+The `edit_user_profile` action allows me to add content to the WordPress default user profile page.
+By doing so, I used the resources provided by `WCPC_History` to load the user profile pictures. 
+
+**How can I improve this?** By creating a custom user profile page which would focus on the
+plugin features added to WordPress default users.
 
 #### 4 - Admins can see the primary selected profile picture on a customer’s order
 
