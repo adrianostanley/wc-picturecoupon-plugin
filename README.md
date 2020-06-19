@@ -1,8 +1,16 @@
 # WooCommerce Picture Coupon Plugin
 
+Here's a "brief" explanation about my decisions and guidelines to develop the requested plugin.
+
+Along with the next paragraphs, I tried to add to the explanation some ideas for having a better plugin
+in terms of usability, security and the coding standards itself. Those are things I wanted to do but tried
+to keep the plugin short and simple considering that its main purpose is to demonstrate some of my skills.
+
 ## Compatibility
 
-(wip)
+WooCommerce Picture Coupon Plugin was developed in a PHP 7.4.5 environment with WordPress 5.3.2. For the sake
+of simplicity, I didn't spend time in compatibility with older versions of PHP, although I haven't use
+its new features to prevent errors if it will be tested by you in lower versions.
 
 **Note:** Although I have used `__('...')` functions, there's no i18n files for the WooCommerce Picture Coupon Plugin.
 
@@ -16,7 +24,12 @@ but to keep it simple, I've selected them manually.
 
 ## Approach / Reasoning to the Solution
 
-(intro)
+Before entering in details about the development of the project, I took some guidelines for myself to be
+followed during this week of development. Due to time constraints and the main purporse of this project, I
+got to stick to these points in order to deliver an easy-to-understand code as well as with the best practices
+as possible.
+
+So, these are the things in my mind while developing the Picture Coupon plugin:
 
 * Use WordPress and WooCommerce API actions and filters whenever they're available to achieve the plugin
 needs;
@@ -206,7 +219,17 @@ working for the sake of this research project delivery.
 
 #### 8 - Only authenticated users can access image information over the API
 
-**How can I improve this?** Using other better authentication methods like OAuth.
+Unfortunately, I wasn't able to achieve this with the basic WordPress REST API endpoints. Although
+`WCPC_Rest_API_Controller` has a funcion called `is_allowed()` which is being passed as the
+`permission_callback` in `register_rest_route`, I couldn't find a way in time to authenticate
+the requests by including a nonce parameter as suggested by its documentation. I left the permissions check returning
+`true`.
+
+I was also taking a look at `WC_Jilt_REST_Settings_Controller`, `WC_REST_Controller` and how `wc_rest_check_manager_permissions`
+works to get a better idea on how SkyVerge does that, but had no success to test that in my development
+environment.
+
+**How can I improve this?** Using better authentication methods like OAuth2.
 
 ## Code Implementation Decisions
 
@@ -228,6 +251,7 @@ Here's a list of functionalities and improvements I would work on if the plugin 
 released as a real project:
 
 * A better separation of actions and filters functions instead of all of them being located in `WCPC_Functions`;
+* Separate the HTML generation from some logins in my classes;
 * Database cleaner methods to remove stored data when the plugin is uninstalled;
 * A better design for the Rest API endpoints controller;
 * A huge maintenance in the user widgets to improve usability, especially for the uploader components;

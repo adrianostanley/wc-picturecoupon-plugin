@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class WCPC_Rest_API_Controller
+ * This class handles the two REST endpoints for the Picture Coupon plugin.
  */
 class WCPC_Rest_API_Controller {
 
@@ -14,14 +14,14 @@ class WCPC_Rest_API_Controller {
 
 		register_rest_route( $namespace, "/profile-pictures/all", array (
 
-			'methods' => 'GET',
+			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'list_all_users_histories' ),
 			'permission_callback' => array( $this, 'is_allowed' )
 		));
 
 		register_rest_route( $namespace, "/profile-pictures/(?P<user_id>\d+)", array (
 
-			'methods' => 'GET',
+			'methods' => WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_user_history' ),
 			'args' => array(
 
@@ -65,6 +65,11 @@ class WCPC_Rest_API_Controller {
 	}
 
 	/**
+	 * Note: Unfortunately, I wasn't able to achieve this with the basic WordPress REST API endpoints.
+	 *
+	 * I couldn't find a way in time to authenticate the requests by including a nonce parameter as suggested by
+	 * WordPress documentation. I left the permissions check returning true.
+	 *
 	 * @return bool true if the user is authenticated and has permissions to access the REST API endpoints.
 	 */
 	function is_allowed() {

@@ -100,19 +100,25 @@ class WCPC_Functions {
 
 		$html = '';
 
-		/** @var WCPC_Picture $picture */
-		foreach ( $profile_pictures as $picture ) {
+		if ( $history->is_empty() ) {
 
-			$html .= sprintf( '
+			$html .= sprintf( '<p>%s</p>', __( 'The user has no profile picture yet.' ));
+		} else {
+
+			/** @var WCPC_Picture $picture */
+			foreach ($profile_pictures as $picture) {
+
+				$html .= sprintf('
 					<span style="display: block; float: left; text-align: center; width: 7%%;">%s<br />
 						<a href="%s" target="_blank">%s</a>
 					</span>
 				',
-				$picture->get_avatar( 96 ),
-				$picture->get_edit_url(),
-				$picture->get_file_name(),
-				__( 'Edit' )
-			);
+					$picture->get_avatar(96),
+					$picture->get_edit_url(),
+					$picture->get_file_name(),
+					__('Edit')
+				);
+			}
 		}
 
 		$html .= '<div style="clear:both;"></div>';
