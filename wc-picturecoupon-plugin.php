@@ -57,6 +57,7 @@ class WCPC_Loader {
 
 			add_action( 'add_meta_boxes', array( $this->functions, 'add_meta_boxes' ) );
 			add_action( 'edit_user_profile', array( $this->functions, 'edit_user_profile' ) );
+			add_action( 'show_user_profile', array( $this->functions, 'edit_user_profile' ) );
 		}
 
 		add_action( 'get_footer', array( $this->functions, 'enqueue_assets' ), 1 );
