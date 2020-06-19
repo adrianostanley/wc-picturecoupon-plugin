@@ -9,18 +9,18 @@ to keep the plugin short and simple considering that its main purpose is to demo
 ## Compatibility
 
 WooCommerce Picture Coupon Plugin was developed in a PHP 7.4.5 environment with WordPress 5.3.2. For the sake
-of simplicity, I didn't spend time with compatibility with older versions of PHP, although I haven't use
+of simplicity, I didn't spend time with compatibility with older versions of PHP, although I haven't used
 its new features to prevent errors if it will be tested by you in lower versions.
 
-**Note:** Although I have used `__('...')` functions, there's no i18n files for the WooCommerce Picture Coupon Plugin.
-
-Finally, in order to allow users to create an account, I've checked both options in the WooCommerce settings
+In order to allow users to create an account, I've checked both options in the WooCommerce settings
 below. It was not clear to me if the plugin should warn admin users about that in case they're unchecked,
 but to keep it simple, I've selected them manually. 
 
 * WooCommerce > Settings > Account & Privacy
   * Allow customers to create an account during checkout
-  * Allow customers to create an account on the "My account" page
+  * Allow customers to create an account on the "My Account" page
+
+**Note:** Although I have used `__('...')` functions, there are no i18n files for the WooCommerce Picture Coupon Plugin.
 
 ## Approach / Reasoning to the Solution
 
@@ -37,10 +37,10 @@ requirements;
 * Treat the profile picture domain classes as objects;
 * Keep the plugin code simple and easy to read - via the documentation above each function and even the
 code itself;
-* Observe how SkyVerge had developed Jilt and its framework plugins to make an attempt to release a code
+* Observe how SkyVerge had developed Jilt and its framework plugins to make an attempt to release code
 in compliance with its standards;
 * Don't spend a lot of time with the layout and the usability itself. Although they are very important,
-especially in a plugin used by users with good and bad WordPress skills, I prefer to dedicate my time on
+especially in a plugin used by users with good and bad WordPress skills, I prefer to dedicate my time to
 its architecture and in the code standards.
 * Register all the improvements I'd do if I had the time to implement them. It's important to explain the
 reasons for the solution, but it's also very important to figure out how they would be better in a real project.
@@ -75,7 +75,7 @@ to move the selected one to the end of it. With that structure, I was able to ac
 Whenever the plugin needs to retrieve the user's profile picture or even the stored pictures, it just has
 to load the user's history by the user ID and call the respective methods.
 
-Finally, `WCPC_History` data is stored in `wp_usermeta` table. Besides the history class, the other structures
+Finally, `WCPC_History` data is stored in the `wp_usermeta` table. Besides the history class, the other structures
 don't even have to deal with that nor even know where is the data coming from. I've made sure `WCPC_History`
 encapsulates all the logic and data manipulation. If a future version of this plugin would be making use of
 a dedicated table in the database for storing the user's profile pictures data, this class is the only one that would have
@@ -152,7 +152,7 @@ asynchronous requests when a user replaces or remove a picture.
 The `edit_user_profile` action allows me to add content to the WordPress default user profile page.
 By doing so, I used the resources provided by `WCPC_History` to load the user profile pictures. 
 
-**How can I improve this?** By creating a custom user profile page which would focus on the
+**How can I improve this?** By creating a custom user profile page that would focus on
 the plugin features added to WordPress default users.
 
 #### 4 - Admins can see the primary selected profile picture on a customer’s order
@@ -189,7 +189,7 @@ by adding a custom form field in `$this->form_fields`.
 The user's history (`WCPC_History`) makes use of this field to prevent new pictures to be added and the
 `WCPC_Uploader` shows a friendly message to users regarding the limit reached.
 
-**How can I improve this?** If the plugin grows with the need of complex settings groups and tabs, I'd
+**How can I improve this?** If the plugin grows with the need for complex settings groups and tabs, I'd
 consider creating its own settings page using the WordPress API.
 
 #### 6 - When visiting a previous order the admin will see the profile image set as the default at the time of that order
@@ -211,7 +211,7 @@ bigger than zero and be a valid user ID.
 Both endpoints call functions in the `WCPC_Rest_API_Controller` as well and they make use of the
 `WCPC_History` functions to retrieve and return users' histories data.
 
-**How can I improve this?** By creating a controller with a better designed as seen in Jilt and the 
+**How can I improve this?** By creating a controller with a better design as seen in Jilt and the 
 SkyVerge framework plugins. I have to say it was the first time I had to release endpoints via WordPress
 API and although I read a few about how a controller must be designed, I chose to keep it simple and
 working for the sake of this research project delivery.
@@ -224,8 +224,8 @@ Unfortunately, I wasn't able to achieve this with the basic WordPress REST API e
 the requests by including a nonce parameter as suggested by its documentation. I left the function returning
 `true` so the endpoints can be used.
 
-I was also taking a look at `WC_Jilt_REST_Settings_Controller`, `WC_REST_Controller` and how `wc_rest_check_manager_permissions`
-works to get a better idea on how SkyVerge does that, but had no success to test that in my development
+I was also taking a look at `WC_Jilt_REST_Settings_Controller`, `WC_REST_Controller`, and how `wc_rest_check_manager_permissions`
+works to get a better idea on how SkyVerge does that but had no success to test that in my development
 environment.
 
 **How can I improve this?** Using better authentication methods like OAuth2.
@@ -237,7 +237,7 @@ environment.
 To make sure my code complied with some SkyVerge standards, I tried to make its structure close
 to some SkyVerge WooCommerce plugins code, like Jilt.
 
-### Class loading
+### Classloading
 
 In my initial development, I was using Composer autoload to load classes. During some refactoring and
 to make sure I was in the right direction of following SkyVerge standards, I've decided to load
@@ -249,11 +249,11 @@ the autoload standards.
 Here's a list of functionalities and improvements I would work on if the plugin was about to be
 released as a real project:
 
-* A better separation of actions and filters functions instead of all of them being located in `WCPC_Functions`;
+* Better separation of actions and filters functions instead of all of them being located in `WCPC_Functions`;
 * Separate the HTML generation from some logics in my domain classes;
 * Database cleaner methods to remove stored data when the plugin is uninstalled;
-* A better design for the Rest API endpoints controller and, of course, fixing its authentication;
-* A huge maintenance in the user widgets to improve usability, especially for the uploader components;
+* Better design for the Rest API endpoints controller and, of course, fixing its authentication;
+* Huge maintenance in the user widgets to improve usability, especially for the uploader components;
 * Improve the plugin compatibility, since it was developed with a PHP 7.4.5 version and it should work
 even in lower versions, preferrable from 5.6.0;
 * Show warnings in the WordPress admin dashboard if the WooCommerce settings for allowing customers to
