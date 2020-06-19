@@ -111,6 +111,10 @@ users to upload pictures with rectangular dimensions.
 
 #### 2 - Customers can change their primary profile image
 
+![Cart widget](https://i.imgur.com/CopeojU.jpg)
+
+![Profile picture management](https://i.imgur.com/DnvsVrc.jpg)
+
 **Navigate to:** My Account > Account details > Change your profile picture (first section).
 
 When the user's history contains more than 1 picture, the "older" ones are shown in a table so the users
@@ -129,6 +133,8 @@ assynchronous requests when a user replaces or remove a picture.
 
 #### 3 - Admins can see all available customer profile images on a customer’s user profile page
 
+![User profile](https://i.imgur.com/GOmZZ4d.jpg)
+
 **Navigate to:** WordPress dashboard (wp-admin) > Users > select a user > scroll down to "Profile pictures" section.
 
 The `edit_user_profile` action allows me to add content to the WordPress default user profile page.
@@ -138,6 +144,8 @@ By doing so, I used the resources provided by `WCPC_History` to load the user pr
 plugin features added to WordPress default users.
 
 #### 4 - Admins can see the primary selected profile picture on a customer’s order
+
+![User's profile picture at the time of checkout](https://i.imgur.com/QGSZ9t2.jpg)
 
 **Navigate to:** WordPress dashboard (wp-admin) > WooCommerce > Orders > click on the order > the image
 is shown in a right side meta box called "User's Profile Picture".
@@ -158,6 +166,8 @@ where the plugin stores tons of meta data, I'd create a dedicated table instead 
 
 #### 5 - Admins can restrict the maximum number of profile images a user can have from within the plugins admin settings
 
+![Plugin settings](https://i.imgur.com/JiDVSKJ.jpg)
+
 **Navigate to:** WordPress dashboard (wp-admin) > WooCommerce > Settings > Integration tab >
 WooCommerce Picture Coupon Plugin link.
 
@@ -176,6 +186,8 @@ The description in **4 - Admins can see the primary selected profile picture on 
 covers this criteria. 
 
 #### 7 - There is a REST API endpoint that returns the name, file type, associated user, and public URL for all customer profile images
+
+![Rest API call](https://i.imgur.com/VA1MS1w.jpg)
 
 `WCPC_Rest_API_Controller register_routes` function adds two endpoints:
 

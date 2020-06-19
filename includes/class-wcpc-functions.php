@@ -100,8 +100,18 @@ class WCPC_Functions {
 		/** @var WCPC_Picture $picture */
 		foreach ( $profile_pictures as $picture ) {
 
-			$html .= $picture->get_avatar( 96 );
+			$html .= sprintf( '
+					<span style="display: block; float: left; text-align: center; width: 7%%;">%s<br />
+						<a href="%s" target="_blank">Edit</a>
+					</span>
+				',
+				$picture->get_avatar( 96 ),
+				get_edit_post_link( $picture->get_id() ),
+				$picture->get_file_name()
+			);
 		}
+
+		$html .= '<div style="clear:both;"></div>';
 
 		echo sprintf("<h2>%s</h2>%s",
 			__("Profile pictures"),
