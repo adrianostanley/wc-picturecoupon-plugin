@@ -209,8 +209,10 @@ the autoload standards.
 
 ## Improvements
 
-Here's a list of functionalities I would work on if the plugin was about to be released as a real project:
+Here's a list of functionalities and improvements I would work on if the plugin was about to be
+released as a real project:
 
+* A better separation of actions and filters instead of being located in `WCPC_Loader`;
 * Database cleaner methods to remove stored data when the plugin is uninstalled;
 * A better design for the Rest API endpoints controller;
 * A huge maintenance in the user widgets to improve usability, especially for the uploader components;
