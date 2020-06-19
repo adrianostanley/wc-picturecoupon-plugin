@@ -29,17 +29,20 @@ class WCPC_Functions {
 			echo sprintf( '
 				<div>%s</div>
 				<div>
-					This is your current profile picture. If it has an article of clothing that is the same type as what you are buying, then you will receive an additional discount.
-					<a href="%s">Click here to switch to another picture</a>.
+					%s
+					<a href="%s">%s</a>.
 				</div>',
 				$history->get_current()->get_avatar( 128 ),
-				$edit_account_url
+				__( 'This is your current profile picture. If it has an article of clothing that is the same type as what you are buying, then you will receive an additional discount.' ),
+				$edit_account_url,
+				__( 'Click here to switch to another picture' )
 			);
 		} else {
 
-			echo sprintf( '<p>%s <a href="%s">Click here to set up your profile picture</a>.</p>',
+			echo sprintf( '<p>%s <a href="%s">%s</a>.</p>',
 				__( 'Did you know that if you have a profile picture with an article of clothing that is the same type as what you are buying (ex: pants, shirt, hat) then you will receive an additional discount?' ),
-				$edit_account_url
+				$edit_account_url,
+				__( 'Click here to set up your profile picture' )
 			);
 		}
 
@@ -52,7 +55,7 @@ class WCPC_Functions {
 	 */
 	public function add_meta_boxes() {
 
-		add_meta_box( 'user_profile_picture_at_order', __( 'User\'s Profile Picture' ), function() {
+		add_meta_box( 'user_profile_picture_at_order', __( "User's Profile Picture" ), function() {
 
 			global $post;
 
@@ -102,19 +105,20 @@ class WCPC_Functions {
 
 			$html .= sprintf( '
 					<span style="display: block; float: left; text-align: center; width: 7%%;">%s<br />
-						<a href="%s" target="_blank">Edit</a>
+						<a href="%s" target="_blank">%s</a>
 					</span>
 				',
 				$picture->get_avatar( 96 ),
-				get_edit_post_link( $picture->get_id() ),
-				$picture->get_file_name()
+				$picture->get_edit_url(),
+				$picture->get_file_name(),
+				__( 'Edit' )
 			);
 		}
 
 		$html .= '<div style="clear:both;"></div>';
 
 		echo sprintf("<h2>%s</h2>%s",
-			__("Profile pictures"),
+			__( 'Profile pictures' ),
 			$html
 		);
 	}

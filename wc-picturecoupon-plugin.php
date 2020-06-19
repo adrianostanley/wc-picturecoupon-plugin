@@ -101,7 +101,7 @@ class WCPC_Loader {
 			// Setting action for plugin
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( $links ) {
 
-				$links[] = '<a href="'. menu_page_url( PICTURE_COUPON, false ) .'&tab=integration">Settings</a>';
+				$links[] = sprintf( '<a href="%s&tab=integration">%s</a>', menu_page_url( PICTURE_COUPON, false ), __('Settings') );
 
 				return $links;
 			});

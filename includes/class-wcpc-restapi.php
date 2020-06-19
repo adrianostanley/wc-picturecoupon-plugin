@@ -51,7 +51,7 @@ class WCPC_Rest_API_Controller {
 
 		if ( ! $user ) {
 
-			return new WP_Error( 'invalid user', sprintf( 'User with id %s was not found ', $request[ 'user_id' ] ) );
+			return new WP_Error( 'invalid user', sprintf( 'User with id %s was not found', $request[ 'user_id' ] ) );
 		}
 
 		$history = WCPC_History::get_user_history_by_user( $user );

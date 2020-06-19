@@ -5,17 +5,20 @@
  */
 class WCPC_Picture {
 
-	/** @var int the image ID stored in wp_posts table */
-	private $id;
-
-	/** @var String the image URL used in src="" attribute of an img tag */
-	private $source;
+	/** @var String */
+	private $edit_url;
 
 	/** @var String */
 	private $file_name;
 
 	/** @var String */
 	private $file_type;
+
+	/** @var int the image ID stored in wp_posts table */
+	private $id;
+
+	/** @var String the image URL used in src="" attribute of an img tag */
+	private $source;
 
 	public function __construct( $id = 0 ) {
 
@@ -34,6 +37,19 @@ class WCPC_Picture {
 			$size,
 			$size
 		);
+	}
+
+	/**
+	 * @return string|null the URL admins can go to edit the picture via the WordPress default functionalities.
+	 */
+	public function get_edit_url() {
+
+		if( ! isset( $this->edit_url ) ) {
+
+			$this->edit_url = get_edit_post_link( $this->get_id() );
+		}
+
+		return $this->edit_url;
 	}
 
 	/**

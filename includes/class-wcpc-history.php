@@ -81,13 +81,16 @@ class WCPC_History {
 		$user = $this->get_user();
 
 		return [
+
 			'count' => count( $this->pictures ),
 			'user' => [
+
 				'id' => $user->ID,
 				'display_name' => $user->display_name,
 				'username' => $user->user_login
 			],
 			'pictures' => array_map(
+
 				function( $picture ) {
 
 					/** @var WCPC_Picture $picture */

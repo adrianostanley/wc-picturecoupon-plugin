@@ -6,6 +6,7 @@ class WCPC_Setup extends \WC_Integration {
 	private static $instance;
 
 	public function __construct() {
+
 		if ( ! isset( self::$instance ) ) {
 
 			$this->id = 'my-plugin-integration';
@@ -28,7 +29,9 @@ class WCPC_Setup extends \WC_Integration {
 	public function init_form_fields() {
 
 		$this->form_fields = array(
+
 			'max_profile_images' => array(
+
 				'title'             => __( 'Max profile images' ),
 				'type'              => 'text',
 				'description'       => __( 'Restricts the maximum number of profile images a user can have' ),

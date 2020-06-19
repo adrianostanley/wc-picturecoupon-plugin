@@ -57,15 +57,21 @@ class WCPC_Uploader {
 
 		if ( $this->history->is_full() ) {
 
-			return sprintf("<span class='wcpc-block'>%s</span>", __("Ops! Looks like you had hit your max amount of uploaded pictures. To unlock more slots, please, buy a <strong>Power Premium Account</strong> from <span class='wcpc-lt'>$999</span> <strong>$998!</strong>"));
+			return sprintf("<span class='wcpc-block'>%s <strong>%s</strong> %s <span class='wcpc-lt'>$999</span> <strong>$998!</strong></span>",
+				__( "Ops! Looks like you had hit your max amount of uploaded pictures. To unlock more slots, please, buy a <strong>Power Premium Account</strong> from <span class='wcpc-lt'>$999</span> <strong>$998!</strong>" ),
+				__( 'Power Premium Account' ),
+				__( 'from' )
+			);
 		}
 
 		return sprintf("
 			<form enctype='multipart/form-data' action='' method='POST'>
-				<input type='file' name='%s[]' multiple /><br><br>
-				<input type='submit' value='Upload' />
-			</form>
-		",self::PROFILE_PICTURE_PARAM_NAME );
+				<input type='file' name='%s[]' multiple /><br /><br />
+				<input type='submit' value='%s' />
+			</form>",
+			self::PROFILE_PICTURE_PARAM_NAME,
+			__( 'Upload' )
+		);
 	}
 
 	/**
@@ -116,20 +122,22 @@ class WCPC_Uploader {
 					<td>%s</td>
 					<td>%s</td>
 					<td>
-						<a href='#' onclick='_wcpc.changeAvatarPicture(%s);'>Use this</a>&nbsp;|&nbsp;
-						<a href='#' onclick='_wcpc.removeAvatarPicture(%s);'>Remove</a>
+						<a href='#' onclick='_wcpc.changeAvatarPicture(%s);'>%s</a>&nbsp;|&nbsp;
+						<a href='#' onclick='_wcpc.removeAvatarPicture(%s);'>%s</a>
 					</td>
 				</tr>",
 				$picture->get_avatar( 48 ),
 				$picture->get_file_name(),
 				$picture->get_id(),
-				$picture->get_id()
+				__( 'Use this' ),
+				$picture->get_id(),
+				__( 'Remove' )
 			);
 		}
 
 		$html .= '</table></div></form>';
 
-		return sprintf( '<hr /><span>You may also switch to a previous profile image</span>%s', $html );
+		return sprintf( '<hr /><span>%s</span>%s', __( 'You may also switch to a previous profile image' ), $html );
 	}
 
 	/**
@@ -143,12 +151,13 @@ class WCPC_Uploader {
 
 		if( ! $current_picture->is_valid() ) {
 
-			return __( 'You don\'t have a profile image yet' );
+			return __( "You don't have a profile image yet" );
 		}
 
 		return sprintf("
-			<span class='wcpc-block'>Current profile picture</span>
+			<span class='wcpc-block'>%s</span>
 			%s",
+			__( 'Current profile picture' ),
 			$current_picture->get_avatar( 96 )
 		);
 	}
