@@ -230,10 +230,14 @@ class WCPC_History {
 	 * This method is a way to create a new instance of a History, loading all the profile pictures of a user from the
 	 * database.
 	 *
-	 * @param int $user_id
+	 * If the user ID is not informed, the function gets the current user ID.
+	 *
+	 * @param int|null $user_id
 	 * @return WCPC_History
 	 */
-	public static function get_user_history( $user_id ) {
+	public static function get_user_history( $user_id = null ) {
+
+		$user_id = $user_id ?? get_current_user_id();
 
 		$pictures = get_user_meta( $user_id, self::PROFILE_PICTURES_HISTORY_META_NAME, false );
 

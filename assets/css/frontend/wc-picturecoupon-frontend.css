@@ -2,6 +2,25 @@
     display: block;
 }
 
+#wcpc-checkout-widget div:first-of-type {
+    float: left;
+    width: 5%;
+}
+
+#wcpc-checkout-widget div:last-of-type {
+    float: right;
+    padding-left: 25px;
+    width: 95%;
+}
+
+#wcpc-checkout-widget div img:first-of-type {
+    width: 100%;
+}
+
+.wcpc-clear {
+    clear: both;
+}
+
 .wcpc-inline {
     display: inline;
 }
@@ -24,7 +43,8 @@
     display: inline;
 }
 
-#wcpc-uploader img.avatar {
+#wcpc-uploader img.avatar,
+#wcpc-checkout-widget img.avatar {
     border: solid 3px #CCC;
     border-radius: 50%;
 }

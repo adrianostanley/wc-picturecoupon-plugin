@@ -19,6 +19,9 @@ defined( 'ABSPATH' ) or exit;
 
 /**
  * The plugin loader class.
+ *
+ * This class is responsible for loading classes, adding all actions, filters, mexaboxes and other components to
+ * WooCommerce pages and functionalities.
  */
 class WCPC_Loader {
 
@@ -60,6 +63,7 @@ class WCPC_Loader {
 		$this->add_action_get_footer();
 		$this->add_action_rest_api_init();
 		$this->add_action_woocommerce_checkout_create_order();
+		$this->add_action_woocommerce_before_cart();
 	}
 
 	/**
@@ -194,6 +198,50 @@ class WCPC_Loader {
 	}
 
 	/**
+	 * Register the action of adding content to the cart and checkout to let users know they will have better discounts
+	 * if they set up a profile picture.
+	 */
+	public function add_action_woocommerce_before_cart() {
+
+		$profile_picture_widget = function () {
+
+			$history = WCPC_History::get_user_history();
+
+			$edit_account_url = esc_url( wc_get_account_endpoint_url( 'edit-account' ) );
+
+			echo '
+				<div class="wcpc-clear"></div>
+				<div id="wcpc-checkout-widget">
+				<h3>' . __( 'Your profile picture may give you a great discount!' ) . '</h3>
+			';
+
+			if( $history->has_profile_picture() ) {
+
+				echo sprintf( '
+					<div>%s</div>
+					<div>
+						This is your current profile picture. If it has an article of clothing that is the same type as what you are buying, then you will receive an additional discount.
+						<a href="%s">Click here to switch to another picture</a>.
+					</div>',
+					$history->get_current()->get_avatar( 128 ),
+					$edit_account_url
+				);
+			} else {
+
+				echo sprintf( '<p>%s <a href="%s">Click here to set up your profile picture</a>.</p>',
+					__( 'Did you know that if you have a profile picture with an article of clothing that is the same type as what you are buying (ex: pants, shirt, hat) then you will receive an additional discount?' ),
+					$edit_account_url
+				);
+			}
+
+			echo '</div><div class="wcpc-clear"></div>';
+		};
+
+		add_action( 'woocommerce_before_cart', $profile_picture_widget );
+		add_action( 'woocommerce_checkout_before_customer_details', $profile_picture_widget );
+	}
+
+	/**
 	 * Registers the action that stores the current user's profile picture in the order meta data.
 	 */
 	public function add_action_woocommerce_checkout_create_order() {
@@ -221,7 +269,7 @@ class WCPC_Loader {
 	 */
 	public function add_filter_get_avatar() {
 
-		add_filter( 'get_avatar' , function ($avatar, $user_ref, $size ) {
+		add_filter( 'get_avatar' , function ( $avatar, $user_ref, $size ) {
 
 			$history = null;
 
@@ -247,7 +295,7 @@ class WCPC_Loader {
 			}
 
 			return $avatar;
-		} , 1 , 5 );
+		}, 1 , 5 );
 	}
 
 	/**
@@ -296,9 +344,8 @@ class WCPC_Loader {
 	}
 }
 
-if ( ! WCPC_Loader::is_woocommerce_active() ) {
-	// If WooCommerce is not active, Picture Coupon plugin must do nothing
-	return;
+if ( WCPC_Loader::is_woocommerce_active() ) {
+	// If WooCommerce is active, Picture Coupon plugin must be activated
+	WCPC_Loader::instance();
 }
 
-WCPC_Loader::instance();
