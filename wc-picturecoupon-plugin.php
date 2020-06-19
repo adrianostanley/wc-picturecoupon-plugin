@@ -213,32 +213,39 @@ class WCPC_Loader {
 	}
 
 	/**
-	 * Registers the filter used by WordPress to replace the default avatars by Gravatar for the selected avatar from the
-	 * user's history.
+	 * Registers the filter used by WordPress to replace the default avatars by Gravatar for the selected avatar from
+	 * the user's history.
+	 *
+	 * This filter will replace user's profile picture only if the user has a history. Otherwise, the default WordPress
+	 * avatars (from Gravatar) will be used.
 	 */
 	public function add_filter_get_avatar() {
 
-		add_filter( 'get_avatar' , function ( $avatar, $id_or_email, $size, $default, $alt ) {
-			$user = false;
-			if ( is_numeric( $id_or_email ) ) {
-				$id = (int) $id_or_email;
-				$user = get_user_by( 'id' , $id );
-			} elseif ( is_object( $id_or_email ) ) {
-				if ( ! empty( $id_or_email->user_id ) ) {
-					$id = (int) $id_or_email->user_id;
-					$user = get_user_by( 'id' , $id );
-				}
-			} else {
-				$user = get_user_by( 'email', $id_or_email );
+		add_filter( 'get_avatar' , function ($avatar, $user_ref, $size ) {
+
+			$history = null;
+
+			if ( is_numeric( $user_ref ) ) {
+
+				$history = WCPC_History::get_user_history( (int) $user_ref);
+			} elseif ( is_string( $user_ref ) ) {
+
+				$user = get_user_by( 'email', $user_ref );
+
+				$history = WCPC_History::get_user_history( $user->ID );
+			} elseif ( property_exists( $user_ref, 'user_id' ) ) {
+
+				$history = WCPC_History::get_user_history( $user_ref->user_id );
+			} elseif ( property_exists( $user_ref, 'ID' ) ) {
+
+				$history = WCPC_History::get_user_history( $user_ref->ID );
 			}
 
-			if ( $user && is_object( $user ) ) {
-				$history = WCPC_History::get_user_history($user->ID);
+			if ( isset($history) && $history->has_profile_picture() ) {
 
-				if ( $history->has_profile_picture() ) {
-					$avatar = $history->get_current()->get_avatar( $size );
-				}
+				$avatar = $history->get_current()->get_avatar( $size );
 			}
+
 			return $avatar;
 		} , 1 , 5 );
 	}
