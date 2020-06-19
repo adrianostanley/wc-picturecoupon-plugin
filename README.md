@@ -32,12 +32,13 @@ its architecture and in the code standards.
 * Register all the improvements I'd do if I had the time to implement them. It's important to explain the
 reasons to the solution, but it's also very important to figure how they would be better in a real project.
 
-To achieve the plugin requirements based on my guidelines, I made use of basically six classes:
+To achieve the plugin requirements based on my guidelines, I made use of basically seven classes:
 
 * `WCPC_Loader` and `WCPC_Setup`: they fire up the plugin, by loading its classes, adding actions and
 filters as well as building the integration with WooCommerce. They're both singleton classes, although
 `WCPC_Setup` has a public constructor to allow WooCommerce to instantiate it (which is something I'd love
 to refactor if I had more time to find a more elegant solution).
+* `WCPC_Functions`: concentrates all the core functions of Picture Coupon plugin.
 * `WCPC_Uploader`: the uploader is a view component to upload, restore and remove profile pictures. This
 is basically the only class that prints HTML to public users.
 * `WCPC_Rest_API_Controller`: this is a simple class with two endpoints added via WordPress API functions.
@@ -89,6 +90,8 @@ with the time constraints, I chose to use most of WordPress and WooCommerce reso
 improve this** section below each criteria shows how I would handle them in a real scenario.
 
 #### 1 - Customers can upload multiple profile pictures
+
+![Account detals](https://i.imgur.com/qezR1ef.jpg)
 
 **Navigate to:** My Account > Account details > Change your profile picture (first section).
 
@@ -212,7 +215,7 @@ the autoload standards.
 Here's a list of functionalities and improvements I would work on if the plugin was about to be
 released as a real project:
 
-* A better separation of actions and filters instead of being located in `WCPC_Loader`;
+* A better separation of actions and filters functions instead of all of them being located in `WCPC_Functions`;
 * Database cleaner methods to remove stored data when the plugin is uninstalled;
 * A better design for the Rest API endpoints controller;
 * A huge maintenance in the user widgets to improve usability, especially for the uploader components;
