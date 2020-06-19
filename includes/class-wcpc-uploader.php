@@ -215,7 +215,7 @@ class WCPC_Uploader {
 
 		while( file_exists( $new_file_path ) ) {
 
-			$new_file_path = sprintf( '%s/%s_%s', $wp_upload_path, $name, $file_counter++ );
+			$new_file_path = sprintf( '%s/%s_%s', $wp_upload_path, $file_counter++, $name );
 		}
 
 		if( move_uploaded_file( $tmp_name, $new_file_path ) ) {
